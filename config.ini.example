@@ -1,0 +1,11 @@
+[pyrogram]
+api_id=api-id
+api_hash= api-hash
+bot_token=bot-token
+
+[overseerrbot]
+admins=[your-telegram-user-id]
+
+[web_api]
+url=https://localhost:5055
+api_key=your-api-key

@@ -5,7 +5,7 @@ from overseerrbot import config
 
 class OverseerrApi:
     def __init__(self):
-        self.base_url = config.get('web_api', 'url')  + '/api/v1'
+        self.base_url = config.get('web_api', 'url') + '/api/v1'
         self.api_key = config.get('web_api', 'api_key')
 
         self.headers = {'X-Api-Key': self.api_key}
@@ -32,7 +32,27 @@ class OverseerrApi:
         data = {
             "take": 20,
             "filter": "pending",
-            "sort": "added"
+            "sort": "-added"
         }
 
         return await self._get("request", data)
+
+    async def get_movie_details(self, movie_id: int):
+        return await self._get(f"movie/{movie_id}")
+
+    async def get_tv_details(self, tv_id: int):
+        return await self._get(f"tv/{tv_id}")
+
+    async def get_media_details(self, type: str, media_id: int):
+        if type == "movie":
+            return await self.get_movie_details(media_id)
+        elif type == "tv":
+            return await self.get_tv_details(media_id)
+
+        return None
+
+    async def approve_request(self, request_id: int):
+        return await self._post(f"request/{request_id}/approve", {})
+
+    async def deny_request(self, request_id: int):
+        return await self._post(f"request/{request_id}/decline", {})

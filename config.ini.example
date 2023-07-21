@@ -9,3 +9,8 @@ admins=[your-telegram-user-id]
 [web_api]
 url=https://localhost:5055
 api_key=your-api-key
+
+[redis]
+host=ip-address
+port=6380
+password=password

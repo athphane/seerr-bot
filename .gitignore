@@ -1,5 +1,6 @@
 venv
 config.ini
 overseerrbot.session
+overseerrbot.session-journal
 output.json
 .idea

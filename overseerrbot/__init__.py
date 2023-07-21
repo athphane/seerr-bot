@@ -1,9 +1,14 @@
 import ast
 import logging
+import os
 from configparser import ConfigParser
 from logging.handlers import TimedRotatingFileHandler
 
 from overseerrbot.bot import OverseerrBot
+
+if not os.path.exists('logs'):
+    os.makedirs('logs')
+
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

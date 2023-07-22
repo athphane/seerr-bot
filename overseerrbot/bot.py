@@ -54,3 +54,17 @@ class OverseerrBot(Client):
         decorator.admin = True
 
         return decorator
+
+    @staticmethod
+    def user_mentionable(entity: Message or CallbackQuery):
+        if entity.from_user.username:
+            user_mentionable = f"@{entity.from_user.username}"
+        else:
+            if entity.from_user.last_name:
+                name_string = f"{entity.from_user.first_name} {entity.from_user.last_name}"
+            else:
+                name_string = f"{entity.from_user.first_name}"
+
+            user_mentionable = f"<a href='tg://user?id={entity.from_user.id}'>{name_string}</a>"
+
+        return user_mentionable

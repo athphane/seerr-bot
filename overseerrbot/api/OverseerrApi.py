@@ -56,3 +56,12 @@ class OverseerrApi:
 
     async def deny_request(self, request_id: int):
         return await self._post(f"request/{request_id}/decline", {})
+
+    @staticmethod
+    async def get_poster(poster_url: str):
+        tmdb_link = 'https://image.tmdb.org/t/p/w600_and_h900_bestv2'
+        poster_url = f"{tmdb_link}{poster_url}"
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(poster_url) as response:
+                return await response.read()

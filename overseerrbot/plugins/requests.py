@@ -1,6 +1,5 @@
 from io import BytesIO
 
-from PIL import Image
 from pyrogram import emoji
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
@@ -8,6 +7,41 @@ from overseerrbot import OverseerrBot
 from overseerrbot.api.OverseerrApi import OverseerrApi
 from overseerrbot.helpers import filters
 from overseerrbot.redis import RedisDatabase
+
+
+async def get_media_poster(poster_path):
+    """
+    Determines the poster path and returns the poster.
+    """
+    api = OverseerrApi()
+
+    poster_binary = await api.get_poster(poster_path)
+    poster = BytesIO(poster_binary)
+
+    if poster.getbuffer().nbytes < 0:
+        # Overseerr logo as default image. Will change later.
+        poster = 'https://raw.githubusercontent.com/sct/overseerr/68c7b3650ec82437bdb128f72f734e227ad763cb/public' \
+                 '/apple-splash-2778-1284.jpg'
+
+    return poster
+
+
+async def make_request_buttons(request_id):
+    """
+    Makes the buttons for the request message.
+    """
+    buttons = [
+        [
+            InlineKeyboardButton(f"{emoji.CHECK_MARK_BUTTON} Approve Request",
+                                 callback_data=f"approve_request+{request_id}"),
+        ],
+        [
+            InlineKeyboardButton(f"{emoji.STOP_SIGN} Deny Request",
+                                 callback_data=f"deny_request+{request_id}"),
+        ]
+    ]
+
+    return buttons
 
 
 @OverseerrBot.on_message(filters.command('requests'))
@@ -26,8 +60,7 @@ async def send_requests(_, message: Message):
 
             if not redis.checkIfSent(media_request['id']):
                 media_details = await api.get_media_details(media_type, media_id)
-                poster_binary = await api.get_poster(media_details['posterPath'])
-                poster = BytesIO(poster_binary)
+                poster = await get_media_poster(media_details['posterPath'])
 
                 name = ''
                 if 'name' in media_details:
@@ -35,26 +68,13 @@ async def send_requests(_, message: Message):
                 elif 'title' in media_details:
                     name = media_details['title']
 
-                buttons = [
-                    [
-                        InlineKeyboardButton(f"{emoji.CHECK_MARK_BUTTON} Approve Request",
-                                             callback_data=f"approve_request+{request_id}"),
-                    ],
-                    [
-                        InlineKeyboardButton(f"{emoji.STOP_SIGN} Deny Request",
-                                             callback_data=f"deny_request+{request_id}"),
-                    ]
-                ]
-
-                caption = (
-                    f"{name} is pending approval.\n\n"
-                    f"Requested By: {media_request['requestedBy']['displayName']}\n"
-                )
-
                 message = await message.reply_photo(
                     photo=poster,
-                    caption=caption,
-                    reply_markup=InlineKeyboardMarkup(buttons)
+                    caption=(
+                        f"{name} is pending approval.\n\n"
+                        f"Requested By: {media_request['requestedBy']['displayName']}\n"
+                    ),
+                    reply_markup=InlineKeyboardMarkup(await make_request_buttons(request_id))
                 )
 
                 if message.id:

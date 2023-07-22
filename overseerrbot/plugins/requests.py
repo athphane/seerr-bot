@@ -15,7 +15,6 @@ from overseerrbot.redis import RedisDatabase
 async def send_requests(_, message: Message):
     api = OverseerrApi()
     redis = RedisDatabase()
-    redis.clearDatabase()
     new_requests_sent = False
     media_requests = await api.get_requests()
 

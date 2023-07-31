@@ -4,3 +4,5 @@ overseerrbot.session
 overseerrbot.session-journal
 output.json
 .idea
+
+**/__pycache__/
